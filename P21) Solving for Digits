@@ -1,0 +1,144 @@
+-----------------------------
+
+P21) Solving For Digits
+- Backtracking
+
+Suppose we consider two numbers, plus their sum, and replace all occurences of each digit by a symbol:
+
+Example: 054 + 450 = 0504 can be written as ABC + CBA = ABAC where A = 0, B = 5, and C = 4.
+
+We furthermore specify that all symbols are distinct; a given digit is associated with a unique symbol.
+
+Given a list of symbols, and three strings of these symbols, 
+find the unique set of assignments of digits to the symbols such that the first two strings sum to the third string, 
+using a backtracking search (you may assume all test cases only admit one possible set of assignments where all symbols are distinct) 
+
+The assignments are to be outputted by placing the digits in order, corresponding to the list of symbols.
+
+Example:
+
+Input:
+ABC
+ABC
+CBA
+ABAC
+Output:
+054
+This is the example above.
+
+Input:
+ABCDEFGHI
+ICEBD
+HEGDA
+CDIAFH
+Output:
+231760598
+Here, the assignments A = 2, B = 3, C = 1, D = 7, E = 6, F = 0, G = 5, H = 9, and I = 8 leads to 81637 + 96572 = 178209, which corresponds to the input CDIAFH. 
+Therefore, given the symbols ABCDEFGHI, we replace the symbols with their assignments and return 231760598
+
+-----------------------------
+
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+vector<bool> used(10);
+map<char,int> combos;
+//vector<pair<char, int>> combos;
+
+
+bool validate(int count, string s1, string s2, string s3, string alphabet) {
+  int val1 = 0, val2 = 0, val3 = 0, m = 1, j, i;
+
+  char first, second, third;
+  int num1, num2, num3, carry = 0;
+  
+  for (int i = s1.length() - 1, j = s3.length() - 1; i >= 0 && j >= 0; i--, j--) {
+
+    if (i == 0 && j == 0){
+      num3 = combos[s3[j]];
+
+      if (num3 + carry != num3){
+        return false;
+      }
+      else {
+        return true;
+      }
+    }
+    else {
+      num1 = combos[s1[i]];
+      num2 = combos[s2[i]];
+      num3 = combos[s3[j]];
+
+      if ((num1 + num2 + carry) % 10 != num3){
+        return false;
+      }
+      
+      if ((num1 + num2 + carry) >= 10){
+        carry = 1;
+      }
+      else {
+        carry = 0;
+      }
+    }
+    
+  }
+  return true;
+}
+
+bool solve(int count, int n, string one, string two, string three, string alphabet) {
+  if (count == n) {
+    if (validate(count, one, two, three, alphabet)) {
+      for (int i = 0; i < n; i++) {
+        cout << combos[alphabet[i]];
+      }
+      return true;
+    }
+    return false;
+  }
+
+  for (int i = 0; i < 10; i++) {
+    if (!used[i]) {
+      combos[alphabet[count]] = i;
+      used[i] = true;
+      if (solve(count + 1, n, one, two, three, alphabet))
+        return true;
+      used[i] = false;
+    }
+  }
+  return false;
+}
+
+int main() {
+
+  string alphabet;
+  getline(cin, alphabet);
+  stringstream a(alphabet);
+
+  string s1;
+  getline(cin, s1);
+  stringstream str1(s1);
+
+  string s2;
+  getline(cin, s2);
+  stringstream str2(s2);
+
+  string s3;
+  getline(cin, s3);
+  stringstream str3(s3);
+
+  char letter;
+  int i = 0;
+
+  while (a >> letter) {
+    combos[letter] = i;
+    i++;
+  }
+
+  solve(0, alphabet.size(), s1, s2, s3, alphabet);
+
+  return 0;
+}
