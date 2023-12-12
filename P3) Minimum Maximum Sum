@@ -1,3 +1,8 @@
+-----------------------------
+
+P3) Minimum Maximum Sum
+- Backtracking
+
 We are given an integer array numbers where numbers[i] is the i-th number. We assign the n numbers to k groups. Each number is assigned to exactly one group. Find the assignment such that the maximum sum of the groups is minimized.
 
 Return the minimum maximum sum.
@@ -25,3 +30,77 @@ Explanation:
 Assignment: group 1: 1,2,8, sum: 11
 group 2: 4,7, sum: 11
 No other assignments can be lower maximum sum.
+
+-----------------------------
+
+
+#include <iostream>
+#include <climits>
+#include <vector>
+
+using namespace std;
+
+void partition(int *arr, int size, int k, int kCount, int elementCount, vector<vector<int>> &subsets, int &minSum) {
+  if (elementCount >= size) {
+    if (kCount == k) {
+      int sum = 0;
+      int maxSum = 0;
+      for (int i = 0; i < subsets.size(); i++) {
+        sum = 0;
+
+        for (int j = 0; j < subsets[i].size(); j++) {
+          sum += subsets[i][j];
+        }
+        if (i == 0) {
+          maxSum = sum;
+        } else {
+          if (sum > maxSum) {
+            maxSum = sum;
+          }
+        }
+      }
+      if (maxSum < minSum) {
+        minSum = maxSum;
+      }
+    }
+    return;
+  }
+
+  for (int i = 0; i < k; i++) {
+    if (subsets[i].size() > 0) {
+      subsets[i].push_back(arr[elementCount]);
+
+      partition(arr, size, k, kCount, elementCount + 1, subsets, minSum);
+
+      subsets[i].pop_back();
+    } else {
+      subsets[i].push_back(arr[elementCount]);
+      partition(arr, size, k, kCount + 1, elementCount + 1, subsets, minSum);
+      subsets[i].pop_back();
+      break;
+    }
+  }
+}
+
+int main() {
+  int size, k;
+
+  cin >> size >> k;
+
+  int *arr = new int[size];
+
+  for (int i = 0; i < size; i++) {
+    cin >> arr[i];
+  }
+
+  vector<vector<int>> subsets(k);
+
+  int minSum = INT_MAX;
+  partition(arr, size, k, 0, 0, subsets, minSum);
+
+  cout << minSum;
+
+  delete[] arr;
+
+  return 0;
+}
