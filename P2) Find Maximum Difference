@@ -1,0 +1,93 @@
+-----------------------------
+
+P2) Find Maximum Difference
+- Divide and Conquer
+
+Given an array A, write a program to find the max(A[j]-A[i]) where i < j. If max(A[j]-A[i])<0, output 0. 
+The input will start with an integer n, which indicates the length of the given array. The next line will be the array.
+
+Example 1
+Input:
+2
+1 5
+Output:
+4
+
+
+Example 2
+Input:
+4
+1 5 8 2
+Output:
+7
+
+
+Example 3
+Input:
+6
+8 7 4 3 2 1
+Output:
+0
+
+-----------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int findMin(int* arr, int l, int r){
+  int min = arr[l];
+  for (int i = l; i <= r; i++) {
+    if (arr[i] < min) {
+      min = arr[i];
+    }
+  }
+  return min;
+}
+
+int findMax(int* arr, int l, int r){
+  int max = arr[l];
+  for (int i = l; i <= r; i++) {
+    if (arr[i] > max) {
+      max = arr[i];
+    }
+  }
+  return max;
+}
+
+int findMaxDiff(int* arr, int l, int r){
+  if (l >= r) {
+    return 0;
+  }
+  int maxDiff = 0;
+  int middle = l + (r - l) / 2;
+
+  int leftMinDiff = findMaxDiff(arr, l, middle);
+  int rightMaxDiff = findMaxDiff(arr, middle + 1, r);
+
+  int currMaxDiff = findMax(arr, middle + 1, r) - findMin(arr, l, middle);
+  
+  return max(max(leftMinDiff, rightMaxDiff), currMaxDiff);
+}
+
+int main() {
+  int size;
+  cin >> size;
+
+  int* arr = new int[size];
+
+  int element;
+  
+  for (int i = 0; i < size; i++) {
+    cin >> element;
+    arr[i] = element;
+  }
+
+  int result = findMaxDiff(arr, 0, size - 1);
+  cout << result;
+
+  delete [] arr;
+  return 0;
+}
