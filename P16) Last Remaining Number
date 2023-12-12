@@ -1,0 +1,69 @@
+-----------------------------
+
+P16) Last Remaining Number
+
+Recursion
+
+Given the integer n, you have a list of all integers in the range [1, n] sorted in a strictly increasing order. Performing the following steps:
+
+Starting from left to right, remove the first number and every other number afterward until you reach the end of the list.
+Repeat the previous step again, but this time from right to left, remove the rightmost number and every other number from the remaining numbers.
+Keep repeating the steps again, alternating left to right and right to left, until a single number remains.
+Return the last remaining number.
+Write a recursive function to solve this problem. The input contains 1 positive integer n with 1 <= n <= 109
+
+Important Info:
+
+You must solve this problem using recursion. If you do not use recursion, then you will not get any points for this assignment.
+Example 1:
+
+Input: 4
+Output: 2
+Explanation: (bold indicate that the number is removed at that step)
+arr = [1, 2, 3, 4]
+arr = [2, 4]
+arr = [2]
+
+Example 2:
+
+Input: 9
+Output: 6
+Explanation: (bold indicate that the number is removed at that step)
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+arr = [2, 4, 6, 8]
+arr = [2, 6]
+arr = [6]
+
+-----------------------------
+
+#include <iostream>
+
+using namespace std;
+
+bool direction = true;
+// bool direction: true for left->right, false for right->left
+
+int lastNumber(int n, bool direction){
+  if (n == 1){
+    return 1;
+  }
+
+  if (!direction){ // if going right->left
+    if (n % 2 == 0){ // if it is even
+      return 2 * lastNumber(n/2, !direction) - 1; // go left->right
+    }
+    else {
+      return 2 * lastNumber(n/2, !direction); // go left->right
+    }
+  }
+  return 2 * lastNumber(n/2, !direction); // go right->left
+}
+
+int main() {
+  int n;
+
+  cin >> n;
+
+  cout << lastNumber(n, direction);
+  return 0;
+}
