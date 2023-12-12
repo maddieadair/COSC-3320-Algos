@@ -1,0 +1,188 @@
+-----------------------------
+
+P19) Random Number Game
+- Divide and Conquer
+
+Two players, Robert and Rachel, play a game with random numbers. On each round, Robert and Rachel each choose a random positive integer. 
+They then earn points, equal to the number of integers chosen by the other player in previous rounds, which are less than their chosen integer. Players earn no points in the first round.
+
+Develop an efficient divide-and-conquer algorithm for computing the final scores of the game for Robert and Rachel, given the series of numbers chosen by each player in each round. 
+A runtime complexity of O(n log n) will be possible.
+
+Hint: Use mergesort as a base for your algorithm. The fact that the subarrays of games under consideration are sorted will help you to efficiently count game wins.
+
+Example
+
+Example of play with a game of four rounds:
+Round 1: Robert chooses 5, Rachel chooses 7.
+Round 2: Robert chooses 3, Rachel chooses 5. Neither player earns points, as Rachel's 5 is equal to Robert's 5 from round 1, while Robert's 3 is less than Rachel's 7.
+Round 3: Robert chooses 6, Rachel chooses 8. Rachel gets 2 points, for besting Robert's 5 and 3. Robert gets 1 point for besting Rachel's 5
+Round 4: Robert chooses 9, Rachel chooses 4. Robert gets 3 points as his 9 bests Rachel's 7, 5, and 8. Rachel gets one point for besting Robert's 3.
+
+
+The total points for Robert is 4, and for Rachel, is 3.
+
+
+The input format for this problem is:
+
+- first line is Robert's chosen numbers, separated by spaces
+
+- second line is Rachel's chosen numbers, separated by spaces
+
+
+The output expected is a single line, with Robert's final score first, followed by Rachel's.
+
+
+Input:
+5 3 6 9
+7 5 8 4
+Output:
+4 3
+
+
+This is the example game described above.
+
+-----------------------------
+
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+int robertTotal = 0;
+int rachelTotal = 0;
+
+
+int totalCountSmaller(vector<int> subArr1, vector<int> subArr2){
+  int index = 0;
+  int tempCount = 0;
+  int finalCount = 0;
+
+
+  while (index < subArr2.size()){
+    while (tempCount < subArr1.size() && subArr2[index] > subArr1[tempCount]){
+      tempCount++;
+    }
+    finalCount += tempCount;
+    index++;
+  }
+  return finalCount;
+}
+
+void merge(vector<int>& robertArr, vector<int>& rachelArr, int start, int mid, int end){
+
+  // get left and right subarray sizes/cutoffs
+  int leftArrSize = mid - start + 1;
+  int rightArrSize = end - mid;
+
+  // declare left and right subarrays for both
+  vector<int> robertLeftArr(leftArrSize);
+  vector<int> robertRightArr(rightArrSize);
+
+  vector<int> rachelLeftArr(leftArrSize);
+  vector<int> rachelRightArr(rightArrSize);
+
+  // copy data to subarrays
+  for (int i = 0; i < leftArrSize; i++){
+    robertLeftArr[i] = robertArr[start + i];
+    rachelLeftArr[i] = rachelArr[start + i];
+  }
+
+  for (int j = 0; j < rightArrSize; j++){
+    robertRightArr[j] = robertArr[mid + 1 + j];
+    rachelRightArr[j] = rachelArr[mid + 1 + j];
+  }
+
+  int robertLeftIndex = 0, robertRightIndex = 0;
+  int rachelLeftIndex = 0, rachelRightIndex = 0;
+
+  int robertCurrIndex = start, rachelCurrIndex = start;
+
+
+  // tally points
+  if (robertLeftIndex < leftArrSize && robertRightIndex < rightArrSize){
+    robertTotal += totalCountSmaller(rachelLeftArr, robertRightArr);
+  }
+
+  if (rachelLeftIndex < leftArrSize && rachelRightIndex < rightArrSize){
+    rachelTotal += totalCountSmaller(robertLeftArr, rachelRightArr);
+  }
+
+  // merge temp subarrays back into arrays
+  while (robertLeftIndex < leftArrSize && robertRightIndex < rightArrSize) {
+    if (robertLeftArr[robertLeftIndex] <= robertRightArr[robertRightIndex]) {
+      robertArr[robertCurrIndex++] = robertLeftArr[robertLeftIndex++];
+    } 
+    else {
+      robertArr[robertCurrIndex++] = robertRightArr[robertRightIndex++];
+    }
+  }
+
+  while (rachelLeftIndex < leftArrSize && rachelRightIndex < rightArrSize) {
+    if (rachelLeftArr[rachelLeftIndex] <= rachelRightArr[rachelRightIndex]) {
+      rachelArr[rachelCurrIndex++] = rachelLeftArr[rachelLeftIndex++];
+    } 
+    else {
+      rachelArr[rachelCurrIndex++] = rachelRightArr[rachelRightIndex++];
+    }
+  }
+
+  // copy remaining elements of left and right subarrays
+  while (robertLeftIndex < leftArrSize){
+    robertArr[robertCurrIndex++] = robertLeftArr[robertLeftIndex++];
+  } 
+
+  while (robertRightIndex < rightArrSize){
+    robertArr[robertCurrIndex++] = robertRightArr[robertRightIndex++];
+  }
+
+  while (rachelLeftIndex < leftArrSize){
+    rachelArr[rachelCurrIndex++] = rachelLeftArr[rachelLeftIndex++];
+  } 
+
+  while (rachelRightIndex < rightArrSize){
+    rachelArr[rachelCurrIndex++] = rachelRightArr[rachelRightIndex++];
+  }
+}
+
+void mergeSort(vector<int>& robertArr, vector<int>& rachelArr, int start, int end){
+  if(start >= end){
+      return;
+  }
+  
+  int mid = start + (end - start) / 2;
+  
+  mergeSort(robertArr, rachelArr, start, mid);
+  mergeSort(robertArr, rachelArr, mid + 1, end);
+  
+  merge(robertArr, rachelArr, start, mid, end);
+}
+
+int main() {
+  string str;
+  getline(cin, str);
+  stringstream s(str);
+
+  int element;
+  vector<int> robertArr;
+  vector<int> rachelArr;
+
+  while (s >> element){
+    robertArr.push_back(element);
+  }
+
+  string str2;
+  getline(cin, str2);
+  stringstream s2(str2);
+
+  while (s2 >> element){
+    rachelArr.push_back(element);
+  }
+
+  mergeSort(robertArr, rachelArr, 0, robertArr.size() - 1);
+
+  cout << robertTotal << " " << rachelTotal;
+
+  return 0;
+}
