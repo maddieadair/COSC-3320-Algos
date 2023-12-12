@@ -1,0 +1,80 @@
+-----------------------------
+
+P1) "Ways to Place Chess Pieces" 
+- Backtracking
+
+Given a board with irregular shape, your task is to place chess pieces and make sure no more than 1 chess pieces is placed on the same row or the same column. 
+Output the number of different ways of such placement.
+
+The first line of the input consists of two integers n and k. n means the size of board is n x n and k is the number of chess pieces to be placed. 
+The next n lines describe the shape of the chess board: '#' describes the board region and '.' is the blank region (cannot place chess piece here)
+
+-----------------------------
+
+#include <iostream>
+
+using namespace std;
+
+bool isSafe(bool **placed, int row, int col) {
+  for (int i = 0; i < row; i++) {
+    if (placed[i][col]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+int numWays(char **arr, bool **placed, int size, int numPieces, int row, int count) {
+  if (count == numPieces) {
+    return 1;
+  }
+  if (row == size) {
+    return 0;
+  }
+
+  int solutions = 0;
+
+  for (int col = 0; col < size; col++) {
+    if (arr[row][col] == '#' && isSafe(placed, row, col)) {
+      placed[row][col] = true;
+      solutions += numWays(arr, placed, size, numPieces, row + 1, count + 1);
+      placed[row][col] = false;
+    }
+  }
+  solutions += numWays(arr, placed, size, numPieces, row + 1, count);
+  return solutions;
+}
+
+int main() {
+  int size, numPieces;
+
+  cin >> size >> numPieces;
+
+  char **arr = new char *[size];
+  bool **placed = new bool *[size];
+
+  for (int i = 0; i < size; i++) {
+    arr[i] = new char[size];
+    placed[i] = new bool[size];
+  }
+
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < size; j++) {
+      cin >> arr[i][j];
+      placed[i][j] = false;
+    }
+  }
+
+  int ans = numWays(arr, placed, size, numPieces, 0, 0);
+  cout << ans;
+
+  for (int i = 0; i < size; i++) {
+    delete[] arr[i];
+    delete[] placed[i];
+  }
+
+  delete[] arr;
+  delete[] placed;
+
+  return 0;
+}
