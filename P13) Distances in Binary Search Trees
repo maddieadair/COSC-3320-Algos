@@ -1,0 +1,108 @@
+-----------------------------
+
+P13) Distances in Binary Search Trees
+
+Given an array representing values to be added to an empty binary search tree in order, and a pair of these values, return the shortest path distance between these values in the tree after all values have been inserted.
+
+Input format:
+line 1: [node values for input tree]
+line 3: [node1] [node2]
+
+Examples
+
+Input:
+3 1 5 7 2 4
+1 7
+Output:
+3
+The shortest path from 1 to 7 is through their common ancestor 3.
+
+Input:
+3 1 5 7 2 4
+3 4
+Output:
+2
+This is because in the completed tree, 5 is a child of 3, and 4 is a child of 5.
+
+-----------------------------
+
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
+struct Node {
+  int key;
+  Node* left;
+  Node* right;
+  Node(int x) : key(x), left(nullptr), right(nullptr) {}
+};
+
+Node* insert(Node* node, int key){
+  if (node == nullptr) {
+    Node* temp = new Node(key);
+    return temp;
+  }
+
+  else if (key < node->key){
+    node->left = insert(node->left, key);
+  }
+  else if (key > node->key){
+    node->right = insert(node->right, key);
+  }
+  return node;
+}
+
+int distance(Node* root, int val){
+  if (root->key == val){
+    return 0;
+  }
+  else if (root->key > val){
+    return 1 + distance(root->left, val);
+  }
+  else {
+    return 1 + distance(root->right, val);
+  }
+}
+
+int findLCA(Node* root, int node1, int node2){
+  if (root == nullptr){
+    return 0;
+  }
+  if (node1 == node2){
+    return 0;
+  }
+  if (root->key > node1 && root->key > node2){
+    return findLCA(root->left, node1, node2);
+  }
+  else if (root->key < node1 && root->key < node2){
+    return findLCA(root->right, node1, node2);
+  }
+  else {
+    return distance(root, node1) + distance(root, node2);
+  }
+}
+
+
+int main() {
+
+  Node* root = nullptr;
+  int value;
+
+  string str;
+  getline(cin, str);
+  stringstream s(str);
+  
+  while (s >> value)
+	{
+		root = insert(root, value);
+	}
+    
+  int node1;
+  int node2;
+
+  cin >> node1 >> node2;
+  cout << findLCA(root, node1, node2);
+  
+  return 0;
+}
