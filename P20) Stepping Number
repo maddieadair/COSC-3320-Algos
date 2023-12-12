@@ -1,0 +1,88 @@
+-----------------------------
+
+P20) Stepping Number
+- Backtracking
+
+A stepping number is an integer such that all of its adjacent digits have an absolute difference of exactly 1. For example, 321 is a stepping number while 421 is not. A single digit integer, is always a stepping number. Given two integers low and high, return a sorted list of all the stepping numbers in the inclusive range [low, high].
+
+Write a backtracking algorithm to solve this problem. The input contains 2 lines. The integer on the first line is low. The integer on the second line is high.
+
+Constraint: 0 <= low <= high <= 2 * 109
+
+Important Info:
+
+You must solve this problem using backtracking. If you do not use backtracking, then you will not get any points for this assignment.
+Example 1:
+
+Input:
+0
+15
+Output:
+0 1 2 3 4 5 6 7 8 9 10 12
+Example 2:
+
+Input:
+300
+350
+Output:
+321 323 343 345
+
+-----------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+void findSol(int low, int high, int currNum, vector<int>& ans){
+
+  if (currNum >= low && currNum <= high){    // within range
+    ans.push_back(currNum);
+  }
+  if (currNum == 0 || currNum > high){    // out of bounds -> backtrack and go back
+    return;
+  }
+  
+  int lastDigit = currNum % 10;
+
+  int above = (currNum * 10) + (lastDigit + 1);
+  int below = (currNum * 10) + (lastDigit - 1);
+
+
+  if (lastDigit == 0){                  // ex. 200 can only go to 201 above
+    findSol(low, high, above, ans);
+  }
+  else if (lastDigit == 9){            // ex. 209 can only go to 208 below
+    findSol(low, high, below, ans);
+  }
+  else {
+    findSol(low, high, above, ans);
+    findSol(low, high, below, ans);
+  }
+}
+
+void steppingNumbers(int low, int high, vector<int>& ans){
+  for (int i = 0; i <= 9; i++){
+    findSol(low, high, i, ans);
+  }
+  sort(ans.begin(), ans.end());
+}
+
+int main() {
+  
+  int low;
+  int high;
+
+  vector<int> ans;
+
+  cin >> low >> high;
+
+  steppingNumbers(low, high, ans);
+
+  for (int i = 0; i < ans.size(); i++){
+    cout << ans[i] << " ";
+  }
+  
+  return 0;
+}
