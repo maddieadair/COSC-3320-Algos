@@ -1,0 +1,121 @@
+-----------------------------
+
+P25) Optimal Job Profit Scheduling
+- Dynamic Programming
+
+Consider a scenario where there are n distinct tasks, each with a designated startTime[i], an endTime[i], and a profit[i]. 
+Design a DP algorithm to return the maximum profit you can take such that there are no two jobs in the subset with overlapping time range.
+
+The input has 3 lines. The 1st line is the array for startTime. The 2nd line is the array for endTime. The 3rd line is the array for profit.
+
+Important Info:
+
+You must solve this problem using dynamic programming (DP). If you do not use DP, you will not receive any credit for this assignment.
+Example 1:
+
+Input:
+1 1 1
+2 3 4
+5 6 4
+Output: 6
+
+Explanation: Choose the 2nd job.
+Example 2:
+
+Input:
+1 2 3 4
+3 4 5 6
+50 10 40 70
+Output: 120
+
+Explanation: Choose the 1st and 4th (last) job.
+Example 3:
+
+Input:
+1 2 3 4 6
+3 5 9 6 9
+20 20 100 70 60
+Output: 150
+
+Explanation: Choose the 1st, 4th, and 5th job.
+
+-----------------------------
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+int nextJob(vector<vector<int>> &jobs, int curr) {
+  for (int next = curr - 1; next >= 0; next--) {
+    if (jobs[next][0] <= jobs[curr][1])
+      return next;
+  }
+  return -1;
+}
+
+int maxProfit(vector<int> &startTime, vector<int> &endTime, vector<int> &profit,
+              vector<vector<int>> &jobs, int n) {
+  sort(jobs.begin(), jobs.end());
+
+  int *dp = new int[n];
+  dp[0] = jobs[0][2];
+
+  for (int i = 1; i < n; i++) {
+    int profitUpTo = jobs[i][2];
+    int next = nextJob(jobs, i);
+    
+    if (next != -1) {
+      profitUpTo += dp[next];
+    }
+
+    dp[i] = max(profitUpTo, dp[i - 1]);
+  }
+
+  int ans = dp[n - 1];
+  delete[] dp;
+
+  return ans;
+}
+
+int main() {
+  string line;
+  getline(cin, line);
+  stringstream s(line);
+
+  int element;
+  int size = 0;
+
+  vector<int> startTime;
+
+  while (s >> element) {
+    size++;
+    startTime.push_back(element);
+  }
+
+  vector<int> endTime(size);
+  vector<int> profit(size);
+
+  for (int i = 0; i < size; i++) {
+    cin >> element;
+    endTime[i] = element;
+  }
+
+  for (int i = 0; i < size; i++) {
+    cin >> element;
+    profit[i] = element;
+  }
+
+  vector<vector<int>> jobs(size);
+  for (int i = 0; i < size; i++) {
+    jobs[i].push_back(endTime[i]);
+    jobs[i].push_back(startTime[i]);
+    jobs[i].push_back(profit[i]);
+  }
+
+  cout << maxProfit(startTime, endTime, profit, jobs, size);
+
+  return 0;
+}
