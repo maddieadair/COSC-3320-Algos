@@ -1,0 +1,116 @@
+-----------------------------
+
+P22) Backtracking Algorithm for Maximum Possible Integer Through Digit Swaps
+
+Consider a positive number, denoted as M. For instance, if M = 385, by swapping the first digit (3) with the second digit (8), we obtain a larger number M' = 835. 
+Further, by swapping the second and third digits of M', we get M" = 853, which is the largest number that can be formed using the digits of M.
+
+Questions
+
+A) Provide a Backtracking Algorithm that for given two positive numbers, M and K, determine the highest possible number that can be obtained by performing at most K swap operations on the digits of M.
+B) Provide a Backtracking Algorithm that for a given positive integer M, identify the minimum number of swaps, represented as K required to produce the maximum possible number using the digits of M.
+
+Examples
+
+Input:
+129845
+3
+Output:
+985241
+4
+
+Input:
+129814999
+2
+Output:
+999814921
+4
+
+-----------------------------
+
+#include <algorithm>
+#include <iostream>
+#include <climits>
+
+using namespace std;
+
+void findMaximumNum(string str, int k, string &max, int count) {
+  if (k == 0)
+    return;
+
+
+  char maxChar = str[count];
+  
+  for (int i = count + 1; i < str.length(); i++) {
+    if (str[i] > maxChar)
+      maxChar = str[i];
+  }
+
+  if (maxChar != str[count])
+    k--;
+
+  for (int i = str.length() - 1; i >= count; i--) {
+
+    if (str[i] == maxChar) {
+      swap(str[count], str[i]);
+
+      if (str > max)
+        max = str;
+
+      findMaximumNum(str, k, max, count + 1);
+
+      swap(str[count], str[i]);
+    }
+  }
+}
+
+void minSwaps(string &str, string &maxPossible, int index, int swaps, int &min) {
+  
+  if (str == maxPossible) {
+    if (swaps < min) {
+      min = swaps;
+    }
+    return;
+  }
+
+  if (str[index] == maxPossible[index]) {
+    minSwaps(str, maxPossible, index + 1, swaps, min);
+  }
+
+
+  for (int i = index + 1; i < str.length(); i++) {
+    if (str[i] == maxPossible[index]) {
+      swap(str[index], str[i]);
+      minSwaps(str, maxPossible, index + 1, swaps + 1, min);
+      swap(str[index], str[i]);
+    }
+  }
+}
+
+int main() {
+  string m;
+  int k;
+
+  cin >> m >> k;
+
+  if (k == 0) {
+    cout << m << '\n';
+  } else {
+    string max = m;
+    findMaximumNum(m, k, max, 0);
+    cout << max << '\n';
+  }
+
+  string highest = m;
+  sort(highest.begin(), highest.end(), greater<>());
+
+  if (m == highest) {
+    cout << 0;
+  } else {
+    int min = INT_MAX;
+    minSwaps(m, highest, 0, 0, min);
+    cout << min;
+  }
+
+  return 0;
+}
