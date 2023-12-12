@@ -9,6 +9,35 @@ Output the number of different ways of such placement.
 The first line of the input consists of two integers n and k. n means the size of board is n x n and k is the number of chess pieces to be placed. 
 The next n lines describe the shape of the chess board: '#' describes the board region and '.' is the blank region (cannot place chess piece here)
 
+Example 1
+Input:
+2 1
+.#
+#.
+Output:
+2
+
+
+Example 2
+Input:
+3 3
+#.#
+.##
+.##
+Output:
+2
+
+
+Example 3
+Input:
+4 4
+...#
+..#.
+.#..
+#...
+Output:
+1
+
 -----------------------------
 
 #include <iostream>
